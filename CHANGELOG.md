@@ -5,6 +5,12 @@ All notable changes to **PersonalChestHeeler** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-10-10
+
+### Added
+- Configured Nexus Mods integration with Mod ID `4357` in project metadata and portal publishing tooling.
+- Enabled automated GitHub Actions CI/CD workflow (`.github/workflows/publish.yml`) for portal deployments to Thunderstore, Hexium, and Nexus Mods.
+
 ## [1.0.0] - 2026-10-10
 
 ### Added

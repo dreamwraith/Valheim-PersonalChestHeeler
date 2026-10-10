@@ -8,7 +8,7 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
     <InformationalVersion>$(Version)</InformationalVersion>
@@ -19,7 +19,7 @@
     <Description>Tiered personal locked storage chests scaled across Valheim progression ages with server-synced configurable capacity, crafting recipes, and subtle emissive lock indicators.</Description>
     <PackageProjectUrl>https://github.com/dreamwraith/Valheim-PersonalChestHeeler</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dreamwraith/Valheim-PersonalChestHeeler</RepositoryUrl>
-    <NexusModId></NexusModId>
+    <NexusModId>4357</NexusModId>
     <NexusFileId></NexusFileId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

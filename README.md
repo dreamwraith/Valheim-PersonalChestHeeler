@@ -6,7 +6,7 @@
 [![Publish Status](https://img.shields.io/github/actions/workflow/status/dreamwraith/Valheim-PersonalChestHeeler/publish.yml?label=Publish%20Portals&logo=githubactions)](https://github.com/dreamwraith/Valheim-PersonalChestHeeler/actions)
 [![Thunderstore](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fthunderstore.io%2Fapi%2Fexperimental%2Fpackage%2FDreamWraith%2FPersonalChestHeeler%2F&query=%24.latest.version_number&label=Thunderstore&logo=thunderstore&color=2980b9)](https://thunderstore.io/c/valheim/p/DreamWraith/PersonalChestHeeler/)
 [![Hexium](https://img.shields.io/badge/Hexium-PersonalChestHeeler-6c5ce7)](https://valheim.hexium.gg/mods/DreamWraith/PersonalChestHeeler)
-[![Nexus Mods](https://img.shields.io/badge/Nexus_Mods-PersonalChestHeeler-da8d24?logo=nexusmods)](https://www.nexusmods.com/valheim/mods/)
+[![Nexus Mods](https://img.shields.io/badge/Nexus_Mods-PersonalChestHeeler-da8d24?logo=nexusmods)](https://www.nexusmods.com/valheim/mods/4357)
 [![Game: Valheim](https://img.shields.io/badge/Valheim-Deep_North_%2F_1.x-1b2838?logo=steam&logoColor=white)](https://store.steampowered.com/app/892970/Valheim/)
 [![BepInEx Pack](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fthunderstore.io%2Fapi%2Fexperimental%2Fpackage%2Fdenikson%2FBepInExPack_Valheim%2F&query=%24.latest.version_number&label=BepInEx&color=5B57E7)](https://valheim.thunderstore.io/package/denikson/BepInExPack_Valheim/)
 [![Target: .NET 4.8](https://img.shields.io/badge/.NET%20Framework-4.8-512BD4?logo=dotnet)](PersonalChestHeeler.csproj)
