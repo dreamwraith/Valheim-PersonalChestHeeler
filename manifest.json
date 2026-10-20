@@ -1,6 +1,6 @@
 {
   "name": "PersonalChestHeeler",
-  "version_number": "1.0.1",
+  "version_number": "1.1.0",
   "website_url": "https://github.com/dreamwraith/Valheim-PersonalChestHeeler",
   "description": "Tiered personal locked storage chests scaled across Valheim progression ages with server-synced configurable capacity, crafting recipes, and subtle emissive lock indicators.",
   "dependencies": [

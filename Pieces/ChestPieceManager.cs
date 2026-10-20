@@ -284,15 +284,13 @@ namespace PersonalChestHeeler.Pieces
             clonedGameObject.transform.localScale *= scaleMultiplier;
             Plugin.LogDebug($"[PieceManager] Scaled '{customPrefabName}' by {scaleMultiplier:F3}x.");
 
-            var netView = clonedGameObject.GetComponent<ZNetView>();
-            if (netView == null)
+            if (!clonedGameObject.TryGetComponent(out ZNetView netView))
             {
                 netView = clonedGameObject.AddComponent<ZNetView>();
             }
             netView.m_syncInitialScale = true;
 
-            var piece = clonedGameObject.GetComponent<Piece>();
-            if (piece == null)
+            if (!clonedGameObject.TryGetComponent(out Piece piece))
             {
                 piece = clonedGameObject.AddComponent<Piece>();
             }
@@ -304,7 +302,7 @@ namespace PersonalChestHeeler.Pieces
             piece.m_placeEffect = ChestAudioEffectManager.GetPlaceEffects(customPrefabName);
 
             var container = clonedGameObject.GetComponentInChildren<Container>();
-            if (container == null)
+            if (!container)
             {
                 container = clonedGameObject.AddComponent<Container>();
             }
@@ -336,9 +334,14 @@ namespace PersonalChestHeeler.Pieces
                 FixTier6Materials(clonedGameObject);
             }
 
-            var wearNTear = clonedGameObject.GetComponent<WearNTear>()
-                            ?? clonedGameObject.GetComponentInChildren<WearNTear>()
-                            ?? clonedGameObject.AddComponent<WearNTear>();
+            if (!clonedGameObject.TryGetComponent(out WearNTear wearNTear))
+            {
+                wearNTear = clonedGameObject.GetComponentInChildren<WearNTear>();
+                if (!wearNTear)
+                {
+                    wearNTear = clonedGameObject.AddComponent<WearNTear>();
+                }
+            }
             wearNTear.m_health = health;
             wearNTear.m_noRoofWear = true;
             wearNTear.m_noSupportWear = true;
@@ -347,8 +350,7 @@ namespace PersonalChestHeeler.Pieces
 
             FixPieceLayers(clonedGameObject);
 
-            var glowController = clonedGameObject.GetComponent<ChestGlowController>();
-            if (glowController == null)
+            if (!clonedGameObject.TryGetComponent(out ChestGlowController glowController))
             {
                 glowController = clonedGameObject.AddComponent<ChestGlowController>();
             }
@@ -710,7 +712,7 @@ namespace PersonalChestHeeler.Pieces
             if (itemName.Equals(RecipeConfigDrawer.DefaultPlaceholderPrefab, StringComparison.OrdinalIgnoreCase)) return false;
 
             var prefab = PrefabManager.Instance != null ? PrefabManager.Instance.GetPrefab(itemName) : null;
-            return prefab != null && prefab.GetComponent<ItemDrop>() != null;
+            return prefab && prefab.TryGetComponent<ItemDrop>(out _);
         }
 
         public static bool TryParseAndValidateRecipe(string recipeString, string pieceName, out RequirementConfig[] requirements)

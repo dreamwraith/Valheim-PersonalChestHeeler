@@ -5,7 +5,6 @@
 [![Last Commit](https://img.shields.io/github/last-commit/dreamwraith/Valheim-PersonalChestHeeler?logo=git)](https://github.com/dreamwraith/Valheim-PersonalChestHeeler/commits/main)
 [![Publish Status](https://img.shields.io/github/actions/workflow/status/dreamwraith/Valheim-PersonalChestHeeler/publish.yml?label=Publish%20Portals&logo=githubactions)](https://github.com/dreamwraith/Valheim-PersonalChestHeeler/actions)
 [![Thunderstore](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fthunderstore.io%2Fapi%2Fexperimental%2Fpackage%2FDreamWraith%2FPersonalChestHeeler%2F&query=%24.latest.version_number&label=Thunderstore&logo=thunderstore&color=2980b9)](https://thunderstore.io/c/valheim/p/DreamWraith/PersonalChestHeeler/)
-[![Hexium](https://img.shields.io/badge/Hexium-PersonalChestHeeler-6c5ce7)](https://valheim.hexium.gg/mods/DreamWraith/PersonalChestHeeler)
 [![Nexus Mods](https://img.shields.io/badge/Nexus_Mods-PersonalChestHeeler-da8d24?logo=nexusmods)](https://www.nexusmods.com/valheim/mods/4357)
 [![Game: Valheim](https://img.shields.io/badge/Valheim-Deep_North_%2F_1.x-1b2838?logo=steam&logoColor=white)](https://store.steampowered.com/app/892970/Valheim/)
 [![BepInEx Pack](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fthunderstore.io%2Fapi%2Fexperimental%2Fpackage%2Fdenikson%2FBepInExPack_Valheim%2F&query=%24.latest.version_number&label=BepInEx&color=5B57E7)](https://valheim.thunderstore.io/package/denikson/BepInExPack_Valheim/)
@@ -17,7 +16,7 @@
 Tiered personal locked storage chests scaled across Valheim progression ages with server-synced configurable capacity, crafting recipes, and subtle emissive lock indicators.
 
 > [!NOTE]
-> **Multiplayer Requirement:** In multiplayer, this mod must be installed on **both the dedicated server and all connecting clients** because it registers custom piece prefabs. It also works seamlessly in standalone single-player.
+> **Multiplayer Requirement:** In multiplayer, this mod must be installed on **both the dedicated server and all connecting clients** because it registers custom piece prefabs. It also works in standalone single-player.
 
 ---
 
@@ -42,7 +41,7 @@ In vanilla Valheim, private locked storage is limited to a single 6-slot Persona
 ## Features
 
 - **Dedicated Hammer Category**: Appears under a dedicated "Personal Chests" tab in the Hammer build menu using Jötunn's Valheim 1.x category support, while retaining Storage filter tags.
-- **Normalized Piece Physics**: All chest colliders are standardized on the `piece` physics layer (layer 10) for seamless building grid snapping, reliable repair targeting, and zero ground clipping.
+- **Normalized Piece Physics**: All chest colliders are standardized on the `piece` physics layer (layer 10) for consistent grid snapping, reliable repair targeting, and zero ground clipping.
 - **Themed Emissive Lock Glow (`ChestGlowController`)**: Each chest features a gentle, lock-centered point light and material emission reflecting its metal/biome tier, instantly distinguishing private storage from shared chests.
 - **Access Control & Dismantle Protection**: Enforces creator ownership across multiplayer servers. Prevents deconstruction of chests containing items.
 - **Admin Lock Bypass**: Server administrators can optionally bypass personal chest locks (`AdminBypassesLock`).
@@ -121,11 +120,11 @@ Settings can be customized directly in-game using the BepInEx **Configuration Ma
 ## Installation
 
 > [!TIP]
-> **Mod Manager Recommended:** Using a modern mod manager like **Gale** or **Thunderstore** makes installation and automatic dependency updates effortless.
+> **Mod Manager Recommended:** Using a modern mod manager like **Gale** or **Thunderstore** handles installation and dependency updates automatically.
 
 ### Mod Manager (Recommended)
 1. Install via **Gale**, **Thunderstore Mod Manager**, or **r2modman**.
-2. Launch Valheim and enjoy!
+2. Launch Valheim.
 
 ### Manual Installation
 1. Ensure **BepInExPack Valheim** is installed.
@@ -143,31 +142,24 @@ The project uses a portable MSBuild configuration that auto-detects standard Ste
 dotnet build -c Release
 ```
 
-The compiled assembly will be placed in `bin/Release/net48/PersonalChestHeeler.dll`. Building in `Release` configuration automatically packages the distribution ZIP to `bin/Publish/PersonalChestHeeler-<Version>.zip`. For details on version bumping and standalone archive generation, see [PACKAGE.md](PACKAGE.md).
+The compiled assembly will be placed in `bin/Release/net48/PersonalChestHeeler.dll`. Building in `Release` configuration automatically packages the distribution ZIP to `bin/Publish/PersonalChestHeeler-<Version>.zip`. For details on version bumping and standalone archive generation, see [.scripts/README.md](.scripts/README.md).
 
 ### Custom & CI Paths
-For non-standard Steam library locations or mod manager profiles, copy `PersonalChestHeeler.csproj.user.example` to `PersonalChestHeeler.csproj.user` in the project root:
+For custom installations, non-standard Steam paths, or mod manager profiles, copy [`Environment.props.example`](Environment.props.example) to `Environment.props` in the project root to configure your paths:
+- `VALHEIM_INSTALL`: Root Valheim installation folder.
+- `BEPINEX_PATH`: Root BepInEx folder (containing `core`, `plugins`, etc.).
 
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<Project>
-  <PropertyGroup>
-    <GamePath>D:\SteamLibrary\steamapps\common\Valheim</GamePath>
-    <BepInExCorePath>$(UserProfile)\AppData\Roaming\com.kesomannen.gale\valheim\profiles\<ProfileName>\BepInEx\core</BepInExCorePath>
-  </PropertyGroup>
-</Project>
-```
-
+Alternatively, you can set `VALHEIM_INSTALL` and `BEPINEX_PATH` as environment variables.
 ---
 
 ## Packaging, Publishing & Releases
 
-All developer automation tools for release management, packaging, and publishing to **Thunderstore**, **Hexium**, and **Nexus Mods** are consolidated into the single PowerShell 7 entrypoint [`.scripts/modtools.ps1`](.scripts/modtools.ps1), powered by the shared [**`DW.ValheimModTools`**](https://github.com/DreamWraith/DW-ValheimModTools) module:
+All developer automation tools for release management, packaging, and publishing to **Thunderstore** and **Nexus Mods** are consolidated into the single PowerShell 7 entrypoint [`.scripts/modtools.ps1`](.scripts/modtools.ps1), powered by the shared [**`DW.ValheimModTools`**](https://github.com/DreamWraith/DW-ValheimModTools) module:
 
 - **Release Management**: `pwsh ./.scripts/modtools.ps1 release` compiles in `Release`, creates mod & source archives, extracts changelog notes, and publishes GitHub Releases (Draft by default, or published with `-Publish`) using the `gh` CLI.
 - **Packaging & Version Bumping**: `pwsh ./.scripts/modtools.ps1 package -Bump Patch` increments SemVer in `PersonalChestHeeler.csproj`, updates `manifest.json`, and bundles distribution archives.
-- **Portal Publishing**: `pwsh ./.scripts/modtools.ps1 publish -Target All` uploads directly to Thunderstore, Hexium, and Nexus Mods APIs.
-- **CI/CD Workflow**: [`.github/workflows/publish.yml`](.github/workflows/publish.yml.example) provides an automated GitHub Actions workflow to publish to Thunderstore, Hexium, and Nexus Mods whenever a GitHub Release is published.
+- **Portal Publishing**: `pwsh ./.scripts/modtools.ps1 publish -Target All` uploads directly to Thunderstore and Nexus Mods APIs.
+- **CI/CD Workflow**: [`.github/workflows/publish.yml`](.github/workflows/publish.yml) provides an automated GitHub Actions workflow to publish to Thunderstore and Nexus Mods whenever a GitHub Release is published.
 
 For detailed documentation on flags, workflows, and secret configuration, see [`.scripts/README.md`](.scripts/README.md).
 

@@ -11,19 +11,19 @@ namespace PersonalChestHeeler.Patches
     /// </summary>
     public static class ContainerPatches
     {
-        [HarmonyPatch(typeof(Container), "CheckAccess")]
+        [HarmonyPatch(typeof(Container), nameof(Container.CheckAccess))]
         public static class Container_CheckAccess_Patch
         {
             [HarmonyPrefix]
             public static bool Prefix(Container __instance, long playerID, ref bool __result)
             {
-                if (ModConfig.EnableMod == null || !ModConfig.EnableMod.Value)
+                if (!ModConfig.EnableMod.Value)
                 {
                     return true;
                 }
 
                 // If admin bypass is enabled and local player is a verified server admin, grant access
-                if (ModConfig.AdminBypassesLock != null && ModConfig.AdminBypassesLock.Value)
+                if (ModConfig.AdminBypassesLock.Value)
                 {
                     if (SynchronizationManager.Instance != null && SynchronizationManager.Instance.PlayerIsAdmin)
                     {
@@ -42,7 +42,7 @@ namespace PersonalChestHeeler.Patches
             [HarmonyPostfix]
             public static void Postfix(Container __instance, ref string __result)
             {
-                if (ModConfig.EnableMod == null || !ModConfig.EnableMod.Value)
+                if (!ModConfig.EnableMod.Value)
                 {
                     return;
                 }
@@ -52,8 +52,7 @@ namespace PersonalChestHeeler.Patches
                     return;
                 }
 
-                var piece = __instance.GetComponent<Piece>();
-                if (piece == null)
+                if (!__instance.TryGetComponent(out Piece piece))
                 {
                     return;
                 }
@@ -64,7 +63,7 @@ namespace PersonalChestHeeler.Patches
                     return;
                 }
 
-                if (Player.m_localPlayer == null || Game.instance == null)
+                if (!Player.m_localPlayer || !Game.instance)
                 {
                     return;
                 }
@@ -83,7 +82,7 @@ namespace PersonalChestHeeler.Patches
                 {
                     string statusText = ModLocalization.Localize(ModLocalization.TokenPromptChestLockedStatus);
                     statusLine = $"\n[<color=#FF5555>{statusText}</color>]";
-                    if (isAdmin && ModConfig.AdminBypassesLock != null && ModConfig.AdminBypassesLock.Value)
+                    if (isAdmin && ModConfig.AdminBypassesLock.Value)
                     {
                         statusLine += " <color=#FFFF55>(Admin Bypass)</color>";
                     }
