@@ -8,7 +8,7 @@
     <LangVersion>12.0</LangVersion>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <PackageWebsiteUrl>https://github.com/dreamwraith/Valheim-PersonalChestHeeler</PackageWebsiteUrl>
     <PackageDescription>Tiered personal locked storage chests scaled across Valheim progression ages with server-synced configurable capacity, crafting recipes, and subtle emissive lock indicators.</PackageDescription>
     <Authors>DreamWraith</Authors>

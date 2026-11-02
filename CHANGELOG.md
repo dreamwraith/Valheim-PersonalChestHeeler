@@ -5,6 +5,18 @@ All notable changes to **PersonalChestHeeler** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-11-01
+
+### Fixed
+- Chest tier toggles and `EnableMod` now actually work, lol. They apply live, and turning off a tier (or the whole mod) pulls it from the build menu. Chests you already placed stay put with your stuff in them. Chest glow turns off with `EnableMod` too.
+
+### Changed
+- `EnableChestGlow` and `ChestGlowIntensity` are client-controlled by default now. Admins can force them with ConditionalConfigSync policy files.
+- Config reloads live when you edit the file, and server changes push to connected players.
+- Dedicated servers only load the chests and synced settings now.
+- Bumped ConditionalConfigSync to 1.0.11 and BepInExPack to 5.4.2360. Server and clients need matching versions of this mod.
+- Build tooling and source layout now match the rest of my mods.
+
 ## [1.1.0] - 2026-10-19
 
 ### Changed
