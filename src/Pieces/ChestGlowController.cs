@@ -262,7 +262,7 @@ namespace PersonalChestHeeler.Pieces
                 UpdateLockRootScale();
             }
 
-            bool glowEnabled = ModConfig.EnableChestGlow != null && ModConfig.EnableChestGlow.Value;
+            bool glowEnabled = ModConfig.EnableMod.Value && ModConfig.EnableChestGlow != null && ModConfig.EnableChestGlow.Value;
             float intensityMultiplier = ModConfig.ChestGlowIntensity != null ? ModConfig.ChestGlowIntensity.Value : 1.0f;
             bool active = glowEnabled && intensityMultiplier > 0.01f;
 

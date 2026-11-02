@@ -81,6 +81,17 @@ namespace PersonalChestHeeler.Pieces
             _ => Color.white
         };
 
+        private static readonly string[] AllPrefabs =
+        {
+            Tier1ChainedPrefab,
+            Tier2BronzePrefab,
+            Tier3IronboundPrefab,
+            Tier4SilverPrefab,
+            Tier5ClockworkPrefab,
+            Tier6FlametalPrefab,
+            Tier7ReliquaryPrefab
+        };
+
         public static void Initialize()
         {
             PrefabManager.OnVanillaPrefabsAvailable += RegisterCustomPieces;
@@ -128,6 +139,15 @@ namespace PersonalChestHeeler.Pieces
             ModConfig.ReliquaryWidth.SettingChanged += (_, _) => UpdatePieceConfiguration(Tier7ReliquaryPrefab);
             ModConfig.ReliquaryHeight.SettingChanged += (_, _) => UpdatePieceConfiguration(Tier7ReliquaryPrefab);
 
+            ModConfig.EnableChainedChest.SettingChanged += (_, _) => UpdatePieceConfiguration(Tier1ChainedPrefab);
+            ModConfig.EnableBronzeChest.SettingChanged += (_, _) => UpdatePieceConfiguration(Tier2BronzePrefab);
+            ModConfig.EnableIronboundChest.SettingChanged += (_, _) => UpdatePieceConfiguration(Tier3IronboundPrefab);
+            ModConfig.EnableSilverChest.SettingChanged += (_, _) => UpdatePieceConfiguration(Tier4SilverPrefab);
+            ModConfig.EnableClockworkChest.SettingChanged += (_, _) => UpdatePieceConfiguration(Tier5ClockworkPrefab);
+            ModConfig.EnableFlametalChest.SettingChanged += (_, _) => UpdatePieceConfiguration(Tier6FlametalPrefab);
+            ModConfig.EnableReliquaryChest.SettingChanged += (_, _) => UpdatePieceConfiguration(Tier7ReliquaryPrefab);
+            ModConfig.EnableMod.SettingChanged += (_, _) => UpdateAllPieceConfigurations();
+            ModConfig.EnableMod.SettingChanged += (_, _) => ChestGlowController.RefreshAll();
             ModConfig.PieceCategory.SettingChanged += (_, _) => UpdateAllPieceCategories();
             ModConfig.EnableChestGlow.SettingChanged += (_, _) => ChestGlowController.RefreshAll();
             ModConfig.ChestGlowIntensity.SettingChanged += (_, _) => ChestGlowController.RefreshAll();
@@ -297,6 +317,7 @@ namespace PersonalChestHeeler.Pieces
             piece.m_name = nameToken;
             piece.m_description = descToken;
             piece.m_canBeRemoved = true;
+            piece.m_enabled = IsPieceEnabled(customPrefabName);
             string categoryName = GetConfiguredCategoryName();
             piece.m_category = PieceManager.Instance.AddPieceCategory(categoryName);
             piece.m_placeEffect = ChestAudioEffectManager.GetPlaceEffects(customPrefabName);
@@ -490,23 +511,30 @@ namespace PersonalChestHeeler.Pieces
             UpdatePieceConfiguration(Tier7ReliquaryPrefab);
         }
 
+        // pieces stay registered when off so placed chests keep their prefab and contents
+        private static bool IsPieceEnabled(string prefabName)
+        {
+            bool tierEnabled = prefabName switch
+            {
+                Tier1ChainedPrefab => ModConfig.EnableChainedChest.Value,
+                Tier2BronzePrefab => ModConfig.EnableBronzeChest.Value,
+                Tier3IronboundPrefab => ModConfig.EnableIronboundChest.Value,
+                Tier4SilverPrefab => ModConfig.EnableSilverChest.Value,
+                Tier5ClockworkPrefab => ModConfig.EnableClockworkChest.Value,
+                Tier6FlametalPrefab => ModConfig.EnableFlametalChest.Value,
+                Tier7ReliquaryPrefab => ModConfig.EnableReliquaryChest.Value,
+                _ => true
+            };
+
+            return ModConfig.EnableMod.Value && tierEnabled;
+        }
+
         public static void UpdateAllPieceCategories()
         {
             string categoryName = GetConfiguredCategoryName();
             var pieceCategory = PieceManager.Instance.AddPieceCategory(categoryName);
 
-            string[] allPrefabs =
-            {
-                Tier1ChainedPrefab,
-                Tier2BronzePrefab,
-                Tier3IronboundPrefab,
-                Tier4SilverPrefab,
-                Tier5ClockworkPrefab,
-                Tier6FlametalPrefab,
-                Tier7ReliquaryPrefab
-            };
-
-            foreach (var prefabName in allPrefabs)
+            foreach (var prefabName in AllPrefabs)
             {
                 var customPiece = PieceManager.Instance.GetPiece(prefabName);
                 if (customPiece?.PiecePrefab != null)
@@ -551,6 +579,7 @@ namespace PersonalChestHeeler.Pieces
             if (piece != null)
             {
                 piece.m_category = GetConfiguredPieceCategory();
+                piece.m_enabled = IsPieceEnabled(prefabName);
             }
 
             if (TryParseAndValidateRecipe(recipeString, prefabName, out var requirements))

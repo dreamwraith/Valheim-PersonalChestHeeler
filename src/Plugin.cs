@@ -32,12 +32,6 @@ namespace PersonalChestHeeler
             ChestAudioEffectManager.Initialize();
             ChestPieceManager.Initialize();
 
-            if (!ModConfig.EnableMod.Value)
-            {
-                Log.LogInfo($"{ModName} is disabled in configuration.");
-                return;
-            }
-
             _harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), ModGUID);
             Log.LogInfo($"{ModName} v{ModVersion} loaded successfully.");
         }
