@@ -3,6 +3,8 @@ using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using Jotunn.Managers;
+using Jotunn.Utils;
 using PersonalChestHeeler.Configuration;
 using PersonalChestHeeler.Localization;
 using PersonalChestHeeler.Pieces;
@@ -28,7 +30,18 @@ namespace PersonalChestHeeler
             Log = Logger;
 
             ModConfig.Initialize(Config);
+            new ConfigFileWatcher(Config);
+
+            // servers only need the pieces and synced settings
+            if (GUIManager.IsHeadless())
+            {
+                ChestPieceManager.Initialize();
+                return;
+            }
+
             ModLocalization.Initialize();
+
+            // audio has to subscribe first so its prefabs exist when the pieces register
             ChestAudioEffectManager.Initialize();
             ChestPieceManager.Initialize();
 

@@ -51,7 +51,7 @@ In vanilla Valheim, private locked storage is limited to a single 6-slot Persona
 - **HUD Ownership Indicators**: Contextual hover text highlights lock status (`[Personal Lock (Owned)]` in green, `[Personal Lock (Restricted)]` in red). The indicator also appears on the base game Personal Chest, and admins with the bypass see an "(Admin Bypass)" tag.
 - **Recipe Editor**: Edit recipes in Configuration Manager with item and amount rows. Borrowed from [Searica](https://github.com/Searica).
 - **3D Build-Menu Icons**: Each chest has a generated icon in the build menu.
-- **Live Configuration Hot-Reload**: Recipes, crafting stations, and visual glow settings apply live and synchronize across clients via `ConditionalConfigSync`. Capacity and health apply when a chest next loads, for example after leaving the area or a restart. Do not lower capacity on chests holding items, because items outside the smaller grid are not moved.
+- **Live Configuration Hot-Reload**: Recipes, crafting stations, and visual glow settings apply live, and server-controlled settings synchronize across clients via `ConditionalConfigSync`. Capacity and health apply when a chest next loads, for example after leaving the area or a restart. Do not lower capacity on chests holding items, because items outside the smaller grid are not moved.
 - **No Asset Bundles**: Chests are cloned from base game assets.
 
 ---
@@ -60,7 +60,7 @@ In vanilla Valheim, private locked storage is limited to a single 6-slot Persona
 
 Settings can be customized directly in-game using the BepInEx **Configuration Manager** (`F1`, installed separately) or by editing `BepInEx/config/dreamwraith.PersonalChestHeeler.cfg`.
 
-On a server, all settings except `EnableDebugLogs` are synced from the server and override local values. Server administrators can release individual settings to clients through policy files in `BepInEx/config/shudnal.ConditionalConfigSync/`.
+On a server, all settings except `EnableChestGlow`, `ChestGlowIntensity`, and `EnableDebugLogs` are synced from the server and override local values. `EnableChestGlow` and `ChestGlowIntensity` stay under each player's control unless a server policy file forces them. Server administrators can release individual settings to clients through policy files in `BepInEx/config/shudnal.ConditionalConfigSync/`.
 
 Leave a station empty to allow building anywhere. An unknown station name logs a warning and also removes the station requirement. An invalid recipe is ignored: at startup the default is used and an error is logged, and a live edit keeps the previous recipe.
 

@@ -92,12 +92,14 @@ namespace PersonalChestHeeler.Configuration
             PieceCategory = BindSynced(config, "1 - General", "PieceCategory", "Personal Chests",
                 "Hammer build menu category name for all personal chests. Supports custom names or vanilla categories (Furniture, Misc, etc.).", 85);
 
-            EnableChestGlow = BindSynced(config, "1 - General", "EnableChestGlow", true,
+            EnableChestGlow = BindClient(config, "1 - General", "EnableChestGlow", true,
                 "Enables subtle emissive material glow and lock point-light indicator on personal chests.", 80);
+            ConfigSync.AddConfigEntry(EnableChestGlow, false);
 
-            ChestGlowIntensity = BindSynced(config, "1 - General", "ChestGlowIntensity", 1.0f,
+            ChestGlowIntensity = BindClient(config, "1 - General", "ChestGlowIntensity", 1.0f,
                 "Intensity multiplier for personal chest emissive glow and lock point lights (0.0 - 3.0).", 70,
                 new AcceptableValueRange<float>(0.0f, 3.0f));
+            ConfigSync.AddConfigEntry(ChestGlowIntensity, false);
 
             EnableDebugLogs = BindClient(config, "1 - General", "EnableDebugLogs", false,
                 "Enables verbose diagnostic logging in the BepInEx console.", 60);
