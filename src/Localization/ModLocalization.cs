@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Jotunn.Entities;
 using Jotunn.Managers;
 
 namespace PersonalChestHeeler.Localization
@@ -36,7 +37,7 @@ namespace PersonalChestHeeler.Localization
 
         public static void Initialize()
         {
-            var customLocalization = LocalizationManager.Instance.GetLocalization();
+            CustomLocalization customLocalization = LocalizationManager.Instance.GetLocalization();
 
             customLocalization.AddTranslation("English", new Dictionary<string, string>
             {

@@ -164,9 +164,9 @@ namespace PersonalChestHeeler.Pieces
 
                 Plugin.LogDebug("[AudioEffectManager] Successfully created and registered all custom chest SFX prefabs via Jotunn.");
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Plugin.Log.LogError($"[AudioEffectManager] Failed to register custom audio prefabs: {ex}");
+                Plugin.Log.LogError($"[AudioEffectManager] Failed to register custom audio prefabs: {exception}");
             }
         }
 
@@ -182,27 +182,27 @@ namespace PersonalChestHeeler.Pieces
             float openPitch = 1.0f,
             float closePitch = 1.0f)
         {
-            var buildPrefab = CreateCustomSfxPrefab($"sfx_pch_{tierKey}_build", buildClips, 1.0f, 1.0f, SfxCategory.Base);
-            var hitPrefab = CreateCustomSfxPrefab($"sfx_pch_{tierKey}_hit", hitClips, 1.0f, 1.0f, SfxCategory.Base);
-            var destroyPrefab = CreateCustomSfxPrefab($"sfx_pch_{tierKey}_destroy", destroyClips, 1.0f, 1.0f, SfxCategory.Base);
-            var openPrefab = CreateCustomSfxPrefab($"sfx_pch_{tierKey}_open", openClips, 1.0f, openPitch, SfxCategory.Base);
-            var closePrefab = CreateCustomSfxPrefab($"sfx_pch_{tierKey}_close", closeClips, 1.0f, closePitch, SfxCategory.Base);
-            var ambientPrefab = CreateCustomSfxPrefab($"sfx_pch_{tierKey}_amb", ambientOverlayClips, ambientBaseline, 1.0f, SfxCategory.Ambient);
+            GameObject? buildPrefab = CreateCustomSfxPrefab($"sfx_pch_{tierKey}_build", buildClips, 1.0f, 1.0f, SfxCategory.Base);
+            GameObject? hitPrefab = CreateCustomSfxPrefab($"sfx_pch_{tierKey}_hit", hitClips, 1.0f, 1.0f, SfxCategory.Base);
+            GameObject? destroyPrefab = CreateCustomSfxPrefab($"sfx_pch_{tierKey}_destroy", destroyClips, 1.0f, 1.0f, SfxCategory.Base);
+            GameObject? openPrefab = CreateCustomSfxPrefab($"sfx_pch_{tierKey}_open", openClips, 1.0f, openPitch, SfxCategory.Base);
+            GameObject? closePrefab = CreateCustomSfxPrefab($"sfx_pch_{tierKey}_close", closeClips, 1.0f, closePitch, SfxCategory.Base);
+            GameObject? ambientPrefab = CreateCustomSfxPrefab($"sfx_pch_{tierKey}_amb", ambientOverlayClips, ambientBaseline, 1.0f, SfxCategory.Ambient);
 
-            if (buildPrefab != null) _customSfxPrefabs[$"{tierKey}_build"] = buildPrefab;
-            if (hitPrefab != null) _customSfxPrefabs[$"{tierKey}_hit"] = hitPrefab;
-            if (destroyPrefab != null) _customSfxPrefabs[$"{tierKey}_destroy"] = destroyPrefab;
-            if (openPrefab != null) _customSfxPrefabs[$"{tierKey}_open"] = openPrefab;
-            if (closePrefab != null) _customSfxPrefabs[$"{tierKey}_close"] = closePrefab;
-            if (ambientPrefab != null) _customSfxPrefabs[$"{tierKey}_amb"] = ambientPrefab;
+            if (buildPrefab) _customSfxPrefabs[$"{tierKey}_build"] = buildPrefab;
+            if (hitPrefab) _customSfxPrefabs[$"{tierKey}_hit"] = hitPrefab;
+            if (destroyPrefab) _customSfxPrefabs[$"{tierKey}_destroy"] = destroyPrefab;
+            if (openPrefab) _customSfxPrefabs[$"{tierKey}_open"] = openPrefab;
+            if (closePrefab) _customSfxPrefabs[$"{tierKey}_close"] = closePrefab;
+            if (ambientPrefab) _customSfxPrefabs[$"{tierKey}_amb"] = ambientPrefab;
         }
 
         private static void CreateAmbientOverlayPrefab(string tierKey, string[] ambientClips, float baseline)
         {
-            var ambPrefab = CreateCustomSfxPrefab($"sfx_pch_{tierKey}_amb", ambientClips, baseline, 1.0f, SfxCategory.Ambient);
-            if (ambPrefab != null)
+            GameObject? ambientPrefab = CreateCustomSfxPrefab($"sfx_pch_{tierKey}_amb", ambientClips, baseline, 1.0f, SfxCategory.Ambient);
+            if (ambientPrefab)
             {
-                _customSfxPrefabs[$"{tierKey}_amb"] = ambPrefab;
+                _customSfxPrefabs[$"{tierKey}_amb"] = ambientPrefab;
             }
         }
 
@@ -210,14 +210,14 @@ namespace PersonalChestHeeler.Pieces
         {
             try
             {
-                var resolvedClips = new List<AudioClip>();
+                List<AudioClip> resolvedClips = new List<AudioClip>();
                 float longestClip = 1.5f;
 
-                foreach (var clipName in clipNames)
+                foreach (string clipName in clipNames)
                 {
                     if (string.IsNullOrWhiteSpace(clipName)) continue;
-                    var clip = PrefabManager.Cache.GetPrefab<AudioClip>(clipName.Trim());
-                    if (clip != null)
+                    AudioClip clip = PrefabManager.Cache.GetPrefab<AudioClip>(clipName.Trim());
+                    if (clip)
                     {
                         resolvedClips.Add(clip);
                         if (clip.length > longestClip)
@@ -237,20 +237,20 @@ namespace PersonalChestHeeler.Pieces
                     return null;
                 }
 
-                var sfxPrefab = PrefabManager.Instance.CreateClonedPrefab(customName, "sfx_chest_open");
-                if (sfxPrefab == null)
+                GameObject sfxPrefab = PrefabManager.Instance.CreateClonedPrefab(customName, "sfx_chest_open");
+                if (!sfxPrefab)
                 {
                     Plugin.Log.LogError($"[AudioEffectManager] Failed to clone 'sfx_chest_open' for '{customName}'.");
                     return null;
                 }
 
-                for (int i = sfxPrefab.transform.childCount - 1; i >= 0; i--)
+                for (int childIndex = sfxPrefab.transform.childCount - 1; childIndex >= 0; childIndex--)
                 {
-                    UnityEngine.Object.Destroy(sfxPrefab.transform.GetChild(i).gameObject);
+                    UnityEngine.Object.Destroy(sfxPrefab.transform.GetChild(childIndex).gameObject);
                 }
 
-                var zsfxComponent = sfxPrefab.GetComponent<ZSFX>();
-                if (zsfxComponent == null)
+                ZSFX zsfxComponent = sfxPrefab.GetComponent<ZSFX>();
+                if (!zsfxComponent)
                 {
                     zsfxComponent = sfxPrefab.AddComponent<ZSFX>();
                 }
@@ -271,8 +271,8 @@ namespace PersonalChestHeeler.Pieces
                 zsfxComponent.m_maxPitch = pitch * 1.03f;
                 zsfxComponent.m_playOnAwake = true;
 
-                var timedDestruction = sfxPrefab.GetComponent<TimedDestruction>();
-                if (timedDestruction != null)
+                TimedDestruction timedDestruction = sfxPrefab.GetComponent<TimedDestruction>();
+                if (timedDestruction)
                 {
                     timedDestruction.m_timeout = Mathf.Max(2.5f, (longestClip / Mathf.Max(0.1f, pitch)) + 0.6f);
                     timedDestruction.m_triggerOnAwake = true;
@@ -288,28 +288,39 @@ namespace PersonalChestHeeler.Pieces
             }
         }
 
+        private static T? GetDonorComponent<T>() where T : Component
+        {
+            GameObject personalDonor = PrefabManager.Instance.GetPrefab(ChestPieceManager.NativePersonalChestDonor);
+            if (personalDonor && personalDonor.TryGetComponent(out T personalComponent))
+            {
+                return personalComponent;
+            }
+
+            GameObject reinforcedDonor = PrefabManager.Instance.GetPrefab(ChestPieceManager.NativeReinforcedDonor);
+            return reinforcedDonor && reinforcedDonor.TryGetComponent(out T reinforcedComponent) ? reinforcedComponent : null;
+        }
+
         public static EffectList GetPlaceEffects(string tierPrefabName)
         {
-            var effectsList = new List<EffectList.EffectData>();
+            List<EffectList.EffectData> effectsList = new List<EffectList.EffectData>();
 
-            if (_customSfxPrefabs.TryGetValue($"{tierPrefabName}_build", out var buildSfxPrefab))
+            if (_customSfxPrefabs.TryGetValue($"{tierPrefabName}_build", out GameObject buildSfxPrefab))
             {
                 effectsList.Add(new EffectList.EffectData { m_prefab = buildSfxPrefab, m_enabled = true });
             }
             else
             {
-                var defaultPieceComponent = PrefabManager.Instance.GetPrefab(ChestPieceManager.NativePersonalChestDonor)?.GetComponent<Piece>()
-                                         ?? PrefabManager.Instance.GetPrefab(ChestPieceManager.NativeReinforcedDonor)?.GetComponent<Piece>();
-                if (defaultPieceComponent != null && defaultPieceComponent.m_placeEffect != null && defaultPieceComponent.m_placeEffect.m_effectPrefabs != null)
+                Piece? defaultPieceComponent = GetDonorComponent<Piece>();
+                if (defaultPieceComponent)
                 {
-                    foreach (var effect in defaultPieceComponent.m_placeEffect.m_effectPrefabs)
+                    foreach (EffectList.EffectData effect in defaultPieceComponent.m_placeEffect.m_effectPrefabs)
                     {
-                        if (effect?.m_prefab != null) effectsList.Add(effect);
+                        if (effect.m_prefab) effectsList.Add(effect);
                     }
                 }
             }
 
-            if (_sfxGlobalMagicBuild != null)
+            if (_sfxGlobalMagicBuild)
             {
                 effectsList.Add(new EffectList.EffectData { m_prefab = _sfxGlobalMagicBuild, m_enabled = true });
             }
@@ -319,26 +330,25 @@ namespace PersonalChestHeeler.Pieces
 
         public static EffectList GetHitEffects(string tierPrefabName)
         {
-            var effectsList = new List<EffectList.EffectData>();
+            List<EffectList.EffectData> effectsList = new List<EffectList.EffectData>();
 
-            if (_customSfxPrefabs.TryGetValue($"{tierPrefabName}_hit", out var hitSfxPrefab))
+            if (_customSfxPrefabs.TryGetValue($"{tierPrefabName}_hit", out GameObject hitSfxPrefab))
             {
                 effectsList.Add(new EffectList.EffectData { m_prefab = hitSfxPrefab, m_enabled = true });
             }
             else
             {
-                var defaultWearNTearComponent = PrefabManager.Instance.GetPrefab(ChestPieceManager.NativePersonalChestDonor)?.GetComponent<WearNTear>()
-                                             ?? PrefabManager.Instance.GetPrefab(ChestPieceManager.NativeReinforcedDonor)?.GetComponent<WearNTear>();
-                if (defaultWearNTearComponent != null && defaultWearNTearComponent.m_hitEffect != null && defaultWearNTearComponent.m_hitEffect.m_effectPrefabs != null)
+                WearNTear? defaultWearNTearComponent = GetDonorComponent<WearNTear>();
+                if (defaultWearNTearComponent)
                 {
-                    foreach (var effect in defaultWearNTearComponent.m_hitEffect.m_effectPrefabs)
+                    foreach (EffectList.EffectData effect in defaultWearNTearComponent.m_hitEffect.m_effectPrefabs)
                     {
-                        if (effect?.m_prefab != null) effectsList.Add(effect);
+                        if (effect.m_prefab) effectsList.Add(effect);
                     }
                 }
             }
 
-            if (_sfxGlobalMagicHit != null)
+            if (_sfxGlobalMagicHit)
             {
                 effectsList.Add(new EffectList.EffectData { m_prefab = _sfxGlobalMagicHit, m_enabled = true });
             }
@@ -348,26 +358,25 @@ namespace PersonalChestHeeler.Pieces
 
         public static EffectList GetDestroyEffects(string tierPrefabName)
         {
-            var effectsList = new List<EffectList.EffectData>();
+            List<EffectList.EffectData> effectsList = new List<EffectList.EffectData>();
 
-            if (_customSfxPrefabs.TryGetValue($"{tierPrefabName}_destroy", out var destroySfxPrefab))
+            if (_customSfxPrefabs.TryGetValue($"{tierPrefabName}_destroy", out GameObject destroySfxPrefab))
             {
                 effectsList.Add(new EffectList.EffectData { m_prefab = destroySfxPrefab, m_enabled = true });
             }
             else
             {
-                var defaultWearNTearComponent = PrefabManager.Instance.GetPrefab(ChestPieceManager.NativePersonalChestDonor)?.GetComponent<WearNTear>()
-                                             ?? PrefabManager.Instance.GetPrefab(ChestPieceManager.NativeReinforcedDonor)?.GetComponent<WearNTear>();
-                if (defaultWearNTearComponent != null && defaultWearNTearComponent.m_destroyedEffect != null && defaultWearNTearComponent.m_destroyedEffect.m_effectPrefabs != null)
+                WearNTear? defaultWearNTearComponent = GetDonorComponent<WearNTear>();
+                if (defaultWearNTearComponent)
                 {
-                    foreach (var effect in defaultWearNTearComponent.m_destroyedEffect.m_effectPrefabs)
+                    foreach (EffectList.EffectData effect in defaultWearNTearComponent.m_destroyedEffect.m_effectPrefabs)
                     {
-                        if (effect?.m_prefab != null) effectsList.Add(effect);
+                        if (effect.m_prefab) effectsList.Add(effect);
                     }
                 }
             }
 
-            if (_sfxGlobalMagicDestroy != null)
+            if (_sfxGlobalMagicDestroy)
             {
                 effectsList.Add(new EffectList.EffectData { m_prefab = _sfxGlobalMagicDestroy, m_enabled = true });
             }
@@ -377,27 +386,27 @@ namespace PersonalChestHeeler.Pieces
 
         public static EffectList GetOpenEffects(string tierPrefabName)
         {
-            var effectsList = new List<EffectList.EffectData>();
+            List<EffectList.EffectData> effectsList = new List<EffectList.EffectData>();
 
-            if (_customSfxPrefabs.TryGetValue($"{tierPrefabName}_open", out var openSfxPrefab))
+            if (_customSfxPrefabs.TryGetValue($"{tierPrefabName}_open", out GameObject openSfxPrefab))
             {
                 effectsList.Add(new EffectList.EffectData { m_prefab = openSfxPrefab, m_enabled = true });
             }
             else
             {
-                var defaultOpen = PrefabManager.Instance.GetPrefab("sfx_chest_open");
-                if (defaultOpen != null)
+                GameObject defaultOpen = PrefabManager.Instance.GetPrefab("sfx_chest_open");
+                if (defaultOpen)
                 {
                     effectsList.Add(new EffectList.EffectData { m_prefab = defaultOpen, m_enabled = true });
                 }
             }
 
-            if (_customSfxPrefabs.TryGetValue($"{tierPrefabName}_amb", out var ambientSfxPrefab))
+            if (_customSfxPrefabs.TryGetValue($"{tierPrefabName}_amb", out GameObject ambientSfxPrefab))
             {
                 effectsList.Add(new EffectList.EffectData { m_prefab = ambientSfxPrefab, m_enabled = true });
             }
 
-            if (_sfxGlobalMagicOpen != null)
+            if (_sfxGlobalMagicOpen)
             {
                 effectsList.Add(new EffectList.EffectData { m_prefab = _sfxGlobalMagicOpen, m_enabled = true });
             }
@@ -407,27 +416,27 @@ namespace PersonalChestHeeler.Pieces
 
         public static EffectList GetCloseEffects(string tierPrefabName)
         {
-            var effectsList = new List<EffectList.EffectData>();
+            List<EffectList.EffectData> effectsList = new List<EffectList.EffectData>();
 
-            if (_customSfxPrefabs.TryGetValue($"{tierPrefabName}_close", out var closeSfxPrefab))
+            if (_customSfxPrefabs.TryGetValue($"{tierPrefabName}_close", out GameObject closeSfxPrefab))
             {
                 effectsList.Add(new EffectList.EffectData { m_prefab = closeSfxPrefab, m_enabled = true });
             }
             else
             {
-                var defaultClose = PrefabManager.Instance.GetPrefab("sfx_chest_close");
-                if (defaultClose != null)
+                GameObject defaultClose = PrefabManager.Instance.GetPrefab("sfx_chest_close");
+                if (defaultClose)
                 {
                     effectsList.Add(new EffectList.EffectData { m_prefab = defaultClose, m_enabled = true });
                 }
             }
 
-            if (_customSfxPrefabs.TryGetValue($"{tierPrefabName}_amb", out var ambientSfxPrefab))
+            if (_customSfxPrefabs.TryGetValue($"{tierPrefabName}_amb", out GameObject ambientSfxPrefab))
             {
                 effectsList.Add(new EffectList.EffectData { m_prefab = ambientSfxPrefab, m_enabled = true });
             }
 
-            if (_sfxGlobalMagicClose != null)
+            if (_sfxGlobalMagicClose)
             {
                 effectsList.Add(new EffectList.EffectData { m_prefab = _sfxGlobalMagicClose, m_enabled = true });
             }

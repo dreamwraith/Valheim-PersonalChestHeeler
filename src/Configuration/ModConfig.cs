@@ -244,13 +244,13 @@ namespace PersonalChestHeeler.Configuration
             AcceptableValueBase? acceptableValues = null,
             Action<ConfigEntryBase>? customDrawer = null)
         {
-            var attributes = new ConfigurationManagerAttributes
+            ConfigurationManagerAttributes attributes = new ConfigurationManagerAttributes
             {
                 Order = order,
                 CustomDrawer = customDrawer
             };
-            var configDescription = new ConfigDescription(description, acceptableValues, attributes);
-            var entry = config.Bind(section, key, defaultValue, configDescription);
+            ConfigDescription configDescription = new ConfigDescription(description, acceptableValues, attributes);
+            ConfigEntry<T> entry = config.Bind(section, key, defaultValue, configDescription);
             ConfigSync.AddConfigEntry(entry);
             return entry;
         }
@@ -265,12 +265,12 @@ namespace PersonalChestHeeler.Configuration
             AcceptableValueBase? acceptableValues = null,
             Action<ConfigEntryBase>? customDrawer = null)
         {
-            var attributes = new ConfigurationManagerAttributes
+            ConfigurationManagerAttributes attributes = new ConfigurationManagerAttributes
             {
                 Order = order,
                 CustomDrawer = customDrawer
             };
-            var configDescription = new ConfigDescription(description, acceptableValues, attributes);
+            ConfigDescription configDescription = new ConfigDescription(description, acceptableValues, attributes);
             return config.Bind(section, key, defaultValue, configDescription);
         }
     }

@@ -28,11 +28,11 @@ namespace PersonalChestHeeler.Configuration
         {
             if (entry == null) return;
 
-            string rawValue = entry.BoxedValue as string ?? string.Empty;
+            string rawValue = entry.BoxedValue is string boxedValue ? boxedValue : string.Empty;
             List<RecipeItemEntry> items = Deserialize(rawValue);
 
             bool isChanged = false;
-            var updatedItems = new List<RecipeItemEntry>();
+            List<RecipeItemEntry> updatedItems = new List<RecipeItemEntry>();
 
             GUILayout.BeginVertical();
 
@@ -48,10 +48,10 @@ namespace PersonalChestHeeler.Configuration
             {
                 for (int itemIndex = 0; itemIndex < items.Count; itemIndex++)
                 {
-                    var item = items[itemIndex];
+                    RecipeItemEntry item = items[itemIndex];
                     GUILayout.BeginHorizontal();
 
-                    string newPrefabName = GUILayout.TextField(item.PrefabName ?? string.Empty, GUILayout.ExpandWidth(true), GUILayout.MinWidth(60f));
+                    string newPrefabName = GUILayout.TextField(item.PrefabName, GUILayout.ExpandWidth(true), GUILayout.MinWidth(60f));
                     if (newPrefabName != item.PrefabName)
                     {
                         item.PrefabName = newPrefabName;
@@ -94,7 +94,7 @@ namespace PersonalChestHeeler.Configuration
 
         public static List<RecipeItemEntry> Deserialize(string rawRecipeString)
         {
-            var parsedEntries = new List<RecipeItemEntry>();
+            List<RecipeItemEntry> parsedEntries = new List<RecipeItemEntry>();
             if (string.IsNullOrWhiteSpace(rawRecipeString)) return parsedEntries;
 
             string[] tokens = rawRecipeString.Split(new[] { ItemSeparator }, StringSplitOptions.RemoveEmptyEntries);

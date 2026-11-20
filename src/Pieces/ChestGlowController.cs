@@ -33,22 +33,22 @@ namespace PersonalChestHeeler.Pieces
 
         public static void EnsureVisualTemplates()
         {
-            if (_templatesResolved && _demisterBallMaterialTemplate != null && _flareTemplate != null)
+            if (_templatesResolved && _demisterBallMaterialTemplate && _flareTemplate)
             {
                 return;
             }
 
-            var mistTorch = PrefabManager.Instance?.GetPrefab("piece_groundtorch_mist");
-            if (mistTorch != null)
+            GameObject mistTorch = PrefabManager.Instance.GetPrefab("piece_groundtorch_mist");
+            if (mistTorch)
             {
-                var ballRenderer = mistTorch.transform.Find("_enabled/demister_ball (1)")?.GetComponent<Renderer>();
-                if (ballRenderer != null && ballRenderer.sharedMaterial != null)
+                Transform ballTransform = mistTorch.transform.Find("_enabled/demister_ball (1)");
+                if (ballTransform && ballTransform.TryGetComponent(out Renderer ballRenderer) && ballRenderer.sharedMaterial)
                 {
                     _demisterBallMaterialTemplate = ballRenderer.sharedMaterial;
                 }
 
-                var flareTransform = mistTorch.transform.Find("_enabled/flare");
-                if (flareTransform != null)
+                Transform flareTransform = mistTorch.transform.Find("_enabled/flare");
+                if (flareTransform)
                 {
                     _flareTemplate = flareTransform.gameObject;
                 }
@@ -84,7 +84,7 @@ namespace PersonalChestHeeler.Pieces
         private void OnDestroy()
         {
             _activeControllers.Remove(this);
-            if (_gemMaterial != null)
+            if (_gemMaterial)
             {
                 Destroy(_gemMaterial);
                 _gemMaterial = null;
@@ -131,9 +131,9 @@ namespace PersonalChestHeeler.Pieces
             _initialized = true;
             EnsureVisualTemplates();
 
-            var childRoot = transform.Find("LockRoot") ?? transform.Find("LockGlowLight");
+            Transform childRoot = FindLockRoot();
             GameObject lockRoot;
-            if (childRoot == null)
+            if (!childRoot)
             {
                 lockRoot = new GameObject("LockRoot");
                 lockRoot.transform.SetParent(transform, false);
@@ -149,8 +149,8 @@ namespace PersonalChestHeeler.Pieces
             _lockRoot.localRotation = Quaternion.identity;
             UpdateLockRootScale();
 
-            var gemTransform = lockRoot.transform.Find("LockGem");
-            if (gemTransform == null)
+            Transform gemTransform = lockRoot.transform.Find("LockGem");
+            if (!gemTransform)
             {
                 _gemObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 _gemObject.name = "LockGem";
@@ -159,8 +159,8 @@ namespace PersonalChestHeeler.Pieces
                 _gemObject.transform.localRotation = Quaternion.identity;
                 _gemObject.transform.localScale = new Vector3(0.065f, 0.065f, 0.035f);
 
-                var gemCollider = _gemObject.GetComponent<Collider>();
-                if (gemCollider != null)
+                Collider gemCollider = _gemObject.GetComponent<Collider>();
+                if (gemCollider)
                 {
                     Destroy(gemCollider);
                 }
@@ -170,10 +170,10 @@ namespace PersonalChestHeeler.Pieces
                 _gemObject = gemTransform.gameObject;
             }
 
-            var gemRenderer = _gemObject.GetComponent<MeshRenderer>();
-            if (gemRenderer != null && _demisterBallMaterialTemplate != null)
+            MeshRenderer gemRenderer = _gemObject.GetComponent<MeshRenderer>();
+            if (gemRenderer && _demisterBallMaterialTemplate)
             {
-                if (_gemMaterial == null)
+                if (!_gemMaterial)
                 {
                     _gemMaterial = new Material(_demisterBallMaterialTemplate);
                     _gemMaterial.name = $"LockGemMat_{TierPrefabName}";
@@ -181,36 +181,36 @@ namespace PersonalChestHeeler.Pieces
                 gemRenderer.sharedMaterial = _gemMaterial;
             }
 
-            var flareTransform = lockRoot.transform.Find("LockFlare");
+            Transform flareTransform = lockRoot.transform.Find("LockFlare");
             GameObject? flareGameObject = null;
-            if (flareTransform == null && _flareTemplate != null)
+            if (!flareTransform && _flareTemplate)
             {
                 flareGameObject = Instantiate(_flareTemplate, lockRoot.transform, false);
                 flareGameObject.name = "LockFlare";
                 flareGameObject.transform.localPosition = Vector3.zero;
                 flareGameObject.transform.localRotation = Quaternion.identity;
 
-                foreach (var lightComponent in flareGameObject.GetComponentsInChildren<Light>(true))
+                foreach (Light lightComponent in flareGameObject.GetComponentsInChildren<Light>(true))
                 {
                     Destroy(lightComponent);
                 }
 
-                foreach (var audioSource in flareGameObject.GetComponentsInChildren<AudioSource>(true))
+                foreach (AudioSource audioSource in flareGameObject.GetComponentsInChildren<AudioSource>(true))
                 {
                     Destroy(audioSource);
                 }
             }
-            else if (flareTransform != null)
+            else if (flareTransform)
             {
                 flareGameObject = flareTransform.gameObject;
             }
 
-            if (flareGameObject != null)
+            if (flareGameObject)
             {
                 _flareParticles = flareGameObject.GetComponent<ParticleSystem>();
-                if (_flareParticles != null)
+                if (_flareParticles)
                 {
-                    var main = _flareParticles.main;
+                    ParticleSystem.MainModule main = _flareParticles.main;
                     main.simulationSpace = ParticleSystemSimulationSpace.Local;
                     main.startSize = 0.22f;
                     main.loop = true;
@@ -219,7 +219,7 @@ namespace PersonalChestHeeler.Pieces
             }
 
             _pointLight = lockRoot.GetComponent<Light>();
-            if (_pointLight == null)
+            if (!_pointLight)
             {
                 _pointLight = lockRoot.AddComponent<Light>();
             }
@@ -234,9 +234,15 @@ namespace PersonalChestHeeler.Pieces
             ApplyCurrentSettings();
         }
 
+        private Transform FindLockRoot()
+        {
+            Transform lockRoot = transform.Find("LockRoot");
+            return lockRoot ? lockRoot : transform.Find("LockGlowLight");
+        }
+
         private void UpdateLockRootScale()
         {
-            if (_lockRoot == null) return;
+            if (!_lockRoot) return;
             Vector3 parentScale = transform.localScale;
             if (Mathf.Abs(parentScale.x) > 0.0001f && Mathf.Abs(parentScale.y) > 0.0001f && Mathf.Abs(parentScale.z) > 0.0001f)
             {
@@ -250,23 +256,23 @@ namespace PersonalChestHeeler.Pieces
 
         public void ApplyCurrentSettings()
         {
-            if (_lockRoot == null)
+            if (!_lockRoot)
             {
-                var child = transform.Find("LockRoot") ?? transform.Find("LockGlowLight");
-                if (child != null) _lockRoot = child;
+                Transform child = FindLockRoot();
+                if (child) _lockRoot = child;
             }
-            if (_lockRoot != null && !string.IsNullOrEmpty(TierPrefabName))
+            if (_lockRoot && !string.IsNullOrEmpty(TierPrefabName))
             {
                 GlowColor = GetLockColor(TierPrefabName);
                 _lockRoot.localPosition = GetLockLocalOffset(TierPrefabName);
                 UpdateLockRootScale();
             }
 
-            bool glowEnabled = ModConfig.EnableMod.Value && ModConfig.EnableChestGlow != null && ModConfig.EnableChestGlow.Value;
-            float intensityMultiplier = ModConfig.ChestGlowIntensity != null ? ModConfig.ChestGlowIntensity.Value : 1.0f;
+            bool glowEnabled = ModConfig.EnableMod.Value && ModConfig.EnableChestGlow.Value;
+            float intensityMultiplier = ModConfig.ChestGlowIntensity.Value;
             bool active = glowEnabled && intensityMultiplier > 0.01f;
 
-            if (_pointLight != null)
+            if (_pointLight)
             {
                 _pointLight.color = GlowColor;
                 _pointLight.range = 2.4f;
@@ -274,7 +280,7 @@ namespace PersonalChestHeeler.Pieces
                 _pointLight.enabled = active;
             }
 
-            if (_gemMaterial != null)
+            if (_gemMaterial)
             {
                 _gemMaterial.SetColor("_Color", GlowColor);
                 if (active)
@@ -289,16 +295,16 @@ namespace PersonalChestHeeler.Pieces
                 }
             }
 
-            if (_gemObject != null)
+            if (_gemObject)
             {
                 _gemObject.SetActive(active);
             }
 
-            if (_flareParticles != null)
+            if (_flareParticles)
             {
                 if (active)
                 {
-                    var main = _flareParticles.main;
+                    ParticleSystem.MainModule main = _flareParticles.main;
                     float alpha = GlowColor.a > 0.01f ? GlowColor.a * 0.80f : 0.80f;
                     main.startColor = new ParticleSystem.MinMaxGradient(new Color(GlowColor.r, GlowColor.g, GlowColor.b, alpha * intensityMultiplier));
                     _flareParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
@@ -316,9 +322,9 @@ namespace PersonalChestHeeler.Pieces
 
         public static void RefreshAll()
         {
-            foreach (var controller in _activeControllers)
+            foreach (ChestGlowController controller in _activeControllers)
             {
-                if (controller != null)
+                if (controller)
                 {
                     controller.ApplyCurrentSettings();
                 }

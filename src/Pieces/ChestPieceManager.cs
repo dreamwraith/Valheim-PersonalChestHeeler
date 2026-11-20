@@ -27,8 +27,8 @@ namespace PersonalChestHeeler.Pieces
 
         public static string GetConfiguredCategoryName()
         {
-            string cat = ModConfig.PieceCategory?.Value?.Trim() ?? string.Empty;
-            return string.IsNullOrWhiteSpace(cat) ? DefaultCategoryName : cat;
+            string categoryName = ModConfig.PieceCategory.Value.Trim();
+            return string.IsNullOrWhiteSpace(categoryName) ? DefaultCategoryName : categoryName;
         }
 
         public static Piece.PieceCategory GetConfiguredPieceCategory()
@@ -55,7 +55,7 @@ namespace PersonalChestHeeler.Pieces
         public static readonly Color ColorReliquary = new(0.792f, 1.000f, 1.000f);   // Pale Glacial Cyan (#CAFFFF)
 
         private static bool _piecesRegistered;
-        private static Sprite? _cachedContainerBkg;
+        private static Sprite? _cachedContainerBackground;
 
         public static float GetTierScaleMultiplier(string prefabName) => prefabName switch
         {
@@ -166,7 +166,7 @@ namespace PersonalChestHeeler.Pieces
                 customPrefabName: Tier1ChainedPrefab,
                 donorPrefabName: NativeChainedDonor,
                 nameToken: ModLocalization.TokenPieceChestChained,
-                descToken: ModLocalization.TokenPieceChestChainedDesc,
+                descriptionToken: ModLocalization.TokenPieceChestChainedDesc,
                 glowColor: ColorChained,
                 recipeString: ModConfig.ChainedRecipe.Value,
                 defaultRecipeString: (string)ModConfig.ChainedRecipe.DefaultValue,
@@ -180,7 +180,7 @@ namespace PersonalChestHeeler.Pieces
                 customPrefabName: Tier2BronzePrefab,
                 donorPrefabName: NativePersonalChestDonor,
                 nameToken: ModLocalization.TokenPieceChestBronze,
-                descToken: ModLocalization.TokenPieceChestBronzeDesc,
+                descriptionToken: ModLocalization.TokenPieceChestBronzeDesc,
                 glowColor: ColorBronze,
                 recipeString: ModConfig.BronzeRecipe.Value,
                 defaultRecipeString: (string)ModConfig.BronzeRecipe.DefaultValue,
@@ -194,7 +194,7 @@ namespace PersonalChestHeeler.Pieces
                 customPrefabName: Tier3IronboundPrefab,
                 donorPrefabName: NativeReinforcedDonor,
                 nameToken: ModLocalization.TokenPieceChestIronbound,
-                descToken: ModLocalization.TokenPieceChestIronboundDesc,
+                descriptionToken: ModLocalization.TokenPieceChestIronboundDesc,
                 glowColor: ColorIronbound,
                 recipeString: ModConfig.IronboundRecipe.Value,
                 defaultRecipeString: (string)ModConfig.IronboundRecipe.DefaultValue,
@@ -208,7 +208,7 @@ namespace PersonalChestHeeler.Pieces
                 customPrefabName: Tier4SilverPrefab,
                 donorPrefabName: NativeSmallDvergrDonor,
                 nameToken: ModLocalization.TokenPieceChestSilver,
-                descToken: ModLocalization.TokenPieceChestSilverDesc,
+                descriptionToken: ModLocalization.TokenPieceChestSilverDesc,
                 glowColor: ColorSilver,
                 recipeString: ModConfig.SilverRecipe.Value,
                 defaultRecipeString: (string)ModConfig.SilverRecipe.DefaultValue,
@@ -222,7 +222,7 @@ namespace PersonalChestHeeler.Pieces
                 customPrefabName: Tier5ClockworkPrefab,
                 donorPrefabName: NativeLargeDvergrDonor,
                 nameToken: ModLocalization.TokenPieceChestClockwork,
-                descToken: ModLocalization.TokenPieceChestClockworkDesc,
+                descriptionToken: ModLocalization.TokenPieceChestClockworkDesc,
                 glowColor: ColorClockwork,
                 recipeString: ModConfig.ClockworkRecipe.Value,
                 defaultRecipeString: (string)ModConfig.ClockworkRecipe.DefaultValue,
@@ -236,7 +236,7 @@ namespace PersonalChestHeeler.Pieces
                 customPrefabName: Tier6FlametalPrefab,
                 donorPrefabName: NativeCharredDonor,
                 nameToken: ModLocalization.TokenPieceChestFlametal,
-                descToken: ModLocalization.TokenPieceChestFlametalDesc,
+                descriptionToken: ModLocalization.TokenPieceChestFlametalDesc,
                 glowColor: ColorFlametal,
                 recipeString: ModConfig.FlametalRecipe.Value,
                 defaultRecipeString: (string)ModConfig.FlametalRecipe.DefaultValue,
@@ -250,7 +250,7 @@ namespace PersonalChestHeeler.Pieces
                 customPrefabName: Tier7ReliquaryPrefab,
                 donorPrefabName: NativeAncientDonor,
                 nameToken: ModLocalization.TokenPieceChestReliquary,
-                descToken: ModLocalization.TokenPieceChestReliquaryDesc,
+                descriptionToken: ModLocalization.TokenPieceChestReliquaryDesc,
                 glowColor: ColorReliquary,
                 recipeString: ModConfig.ReliquaryRecipe.Value,
                 defaultRecipeString: (string)ModConfig.ReliquaryRecipe.DefaultValue,
@@ -267,7 +267,7 @@ namespace PersonalChestHeeler.Pieces
             string customPrefabName,
             string donorPrefabName,
             string nameToken,
-            string descToken,
+            string descriptionToken,
             Color glowColor,
             string recipeString,
             string defaultRecipeString,
@@ -276,7 +276,7 @@ namespace PersonalChestHeeler.Pieces
             int height,
             float health)
         {
-            if (!TryParseAndValidateRecipe(recipeString, customPrefabName, out var requirements))
+            if (!TryParseAndValidateRecipe(recipeString, customPrefabName, out RequirementConfig[] requirements))
             {
                 Plugin.Log.LogError($"[PieceManager] Recipe for '{customPrefabName}' is invalid ('{recipeString}'). Falling back to default: '{defaultRecipeString}'.");
                 if (!TryParseAndValidateRecipe(defaultRecipeString, customPrefabName, out requirements))
@@ -287,7 +287,7 @@ namespace PersonalChestHeeler.Pieces
             }
 
             GameObject clonedGameObject = PrefabManager.Instance.CreateClonedPrefab(customPrefabName, donorPrefabName);
-            if (clonedGameObject == null)
+            if (!clonedGameObject)
             {
                 Plugin.Log.LogError($"[PieceManager] Failed to clone donor prefab '{donorPrefabName}' as '{customPrefabName}'.");
                 return;
@@ -315,14 +315,14 @@ namespace PersonalChestHeeler.Pieces
                 piece = clonedGameObject.AddComponent<Piece>();
             }
             piece.m_name = nameToken;
-            piece.m_description = descToken;
+            piece.m_description = descriptionToken;
             piece.m_canBeRemoved = true;
             piece.m_enabled = IsPieceEnabled(customPrefabName);
             string categoryName = GetConfiguredCategoryName();
             piece.m_category = PieceManager.Instance.AddPieceCategory(categoryName);
             piece.m_placeEffect = ChestAudioEffectManager.GetPlaceEffects(customPrefabName);
 
-            var container = clonedGameObject.GetComponentInChildren<Container>();
+            Container container = clonedGameObject.GetComponentInChildren<Container>();
             if (!container)
             {
                 container = clonedGameObject.AddComponent<Container>();
@@ -335,14 +335,18 @@ namespace PersonalChestHeeler.Pieces
             container.m_width = width;
             container.m_height = height;
 
-            if (_cachedContainerBkg == null)
+            if (!_cachedContainerBackground)
             {
-                var donor = PrefabManager.Instance.GetPrefab(NativePersonalChestDonor);
-                _cachedContainerBkg = donor?.GetComponentInChildren<Container>()?.m_bkg;
+                GameObject donor = PrefabManager.Instance.GetPrefab(NativePersonalChestDonor);
+                Container? donorContainer = donor ? donor.GetComponentInChildren<Container>() : null;
+                if (donorContainer)
+                {
+                    _cachedContainerBackground = donorContainer.m_bkg;
+                }
             }
-            if (_cachedContainerBkg != null)
+            if (_cachedContainerBackground)
             {
-                container.m_bkg = _cachedContainerBkg;
+                container.m_bkg = _cachedContainerBackground;
             }
 
             RebindContainerVisuals(clonedGameObject, container);
@@ -379,22 +383,22 @@ namespace PersonalChestHeeler.Pieces
 
             try
             {
-                var customIcon = RenderManager.Instance.Render(clonedGameObject);
-                if (customIcon != null)
+                Sprite customIcon = RenderManager.Instance.Render(clonedGameObject);
+                if (customIcon)
                 {
                     piece.m_icon = customIcon;
                     Plugin.LogDebug($"[PieceManager] Generated 3D snapshot icon for '{customPrefabName}'.");
                 }
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Plugin.Log.LogWarning($"[PieceManager] Failed to render 3D icon for '{customPrefabName}': {ex.Message}");
+                Plugin.Log.LogWarning($"[PieceManager] Failed to render 3D icon for '{customPrefabName}': {exception.Message}");
             }
 
-            var pieceConfig = new PieceConfig
+            PieceConfig pieceConfig = new PieceConfig
             {
                 Name = nameToken,
-                Description = descToken,
+                Description = descriptionToken,
                 PieceTable = PieceTables.Hammer,
                 Category = categoryName,
                 Usage = new[] { PieceUsages.Storage, PieceUsages.Furniture },
@@ -402,7 +406,7 @@ namespace PersonalChestHeeler.Pieces
                 Requirements = requirements
             };
 
-            var customPiece = new CustomPiece(clonedGameObject, fixReference: true, pieceConfig);
+            CustomPiece customPiece = new CustomPiece(clonedGameObject, fixReference: true, pieceConfig);
             PieceManager.Instance.AddPiece(customPiece);
 
             Plugin.LogDebug($"[PieceManager] Successfully registered CustomPiece '{customPrefabName}' in Hammer.");
@@ -414,11 +418,11 @@ namespace PersonalChestHeeler.Pieces
             if (pieceLayer < 0) pieceLayer = 0;
 
             prefab.layer = pieceLayer;
-            foreach (var col in prefab.GetComponentsInChildren<Collider>(true))
+            foreach (Collider collider in prefab.GetComponentsInChildren<Collider>(true))
             {
-                if (!col.isTrigger)
+                if (!collider.isTrigger)
                 {
-                    col.gameObject.layer = pieceLayer;
+                    collider.gameObject.layer = pieceLayer;
                 }
             }
         }
@@ -427,46 +431,46 @@ namespace PersonalChestHeeler.Pieces
 
         private static void RebindContainerVisuals(GameObject clonedGameObject, Container container)
         {
-            if (container.m_open != null && container.m_open.transform.IsChildOf(clonedGameObject.transform) &&
-                container.m_closed != null && container.m_closed.transform.IsChildOf(clonedGameObject.transform))
+            if (container.m_open && container.m_open.transform.IsChildOf(clonedGameObject.transform) &&
+                container.m_closed && container.m_closed.transform.IsChildOf(clonedGameObject.transform))
             {
                 return;
             }
 
-            GameObject? openObj = null;
-            GameObject? closedObj = null;
+            GameObject? openObject = null;
+            GameObject? closedObject = null;
 
-            foreach (var t in clonedGameObject.GetComponentsInChildren<Transform>(true))
+            foreach (Transform childTransform in clonedGameObject.GetComponentsInChildren<Transform>(true))
             {
-                if (t.gameObject == clonedGameObject) continue;
-                string nameLower = t.name.ToLowerInvariant();
+                if (childTransform.gameObject == clonedGameObject) continue;
+                string childName = childTransform.name;
 
-                if (openObj == null && (nameLower.EndsWith("_open") || nameLower == "open" || nameLower.EndsWith("top_open")))
+                if (!openObject && (childName.EndsWith("_open", StringComparison.OrdinalIgnoreCase) || childName.Equals("open", StringComparison.OrdinalIgnoreCase)))
                 {
-                    openObj = t.gameObject;
+                    openObject = childTransform.gameObject;
                 }
-                if (closedObj == null && (nameLower.EndsWith("_closed") || nameLower == "closed" || nameLower.EndsWith("top_closed")))
+                if (!closedObject && (childName.EndsWith("_closed", StringComparison.OrdinalIgnoreCase) || childName.Equals("closed", StringComparison.OrdinalIgnoreCase)))
                 {
-                    closedObj = t.gameObject;
+                    closedObject = childTransform.gameObject;
                 }
             }
 
-            if (openObj != null)
+            if (openObject)
             {
-                container.m_open = openObj;
+                container.m_open = openObject;
                 container.m_open.SetActive(false);
-                Plugin.LogDebug($"[PieceManager] Repaired container.m_open to '{openObj.name}' on '{clonedGameObject.name}'.");
+                Plugin.LogDebug($"[PieceManager] Repaired container.m_open to '{openObject.name}' on '{clonedGameObject.name}'.");
             }
             else
             {
                 Plugin.Log.LogWarning($"[PieceManager] Could not find open visual for '{clonedGameObject.name}'.");
             }
 
-            if (closedObj != null)
+            if (closedObject)
             {
-                container.m_closed = closedObj;
+                container.m_closed = closedObject;
                 container.m_closed.SetActive(true);
-                Plugin.LogDebug($"[PieceManager] Repaired container.m_closed to '{closedObj.name}' on '{clonedGameObject.name}'.");
+                Plugin.LogDebug($"[PieceManager] Repaired container.m_closed to '{closedObject.name}' on '{clonedGameObject.name}'.");
             }
             else
             {
@@ -532,22 +536,22 @@ namespace PersonalChestHeeler.Pieces
         public static void UpdateAllPieceCategories()
         {
             string categoryName = GetConfiguredCategoryName();
-            var pieceCategory = PieceManager.Instance.AddPieceCategory(categoryName);
+            Piece.PieceCategory pieceCategory = PieceManager.Instance.AddPieceCategory(categoryName);
 
-            foreach (var prefabName in AllPrefabs)
+            foreach (string prefabName in AllPrefabs)
             {
-                var customPiece = PieceManager.Instance.GetPiece(prefabName);
-                if (customPiece?.PiecePrefab != null)
+                CustomPiece customPiece = PieceManager.Instance.GetPiece(prefabName);
+                if (customPiece != null && customPiece.PiecePrefab)
                 {
-                    var piece = customPiece.PiecePrefab.GetComponent<Piece>();
-                    if (piece != null)
+                    Piece piece = customPiece.PiecePrefab.GetComponent<Piece>();
+                    if (piece)
                     {
                         piece.m_category = pieceCategory;
                     }
                 }
             }
 
-            if (Player.m_localPlayer != null)
+            if (Player.m_localPlayer)
             {
                 Player.m_localPlayer.UpdateAvailablePiecesList();
             }
@@ -563,8 +567,8 @@ namespace PersonalChestHeeler.Pieces
                 return;
             }
 
-            var customPiece = PieceManager.Instance.GetPiece(prefabName);
-            if (customPiece == null || customPiece.PiecePrefab == null)
+            CustomPiece customPiece = PieceManager.Instance.GetPiece(prefabName);
+            if (customPiece == null || !customPiece.PiecePrefab)
             {
                 Plugin.LogDebug($"[PieceManager] CustomPiece '{prefabName}' not found in registry for config update.");
                 return;
@@ -575,43 +579,43 @@ namespace PersonalChestHeeler.Pieces
                 return;
             }
 
-            var piece = customPiece.PiecePrefab.GetComponent<Piece>();
-            if (piece != null)
+            Piece piece = customPiece.PiecePrefab.GetComponent<Piece>();
+            if (piece)
             {
                 piece.m_category = GetConfiguredPieceCategory();
                 piece.m_enabled = IsPieceEnabled(prefabName);
             }
 
-            if (TryParseAndValidateRecipe(recipeString, prefabName, out var requirements))
+            if (TryParseAndValidateRecipe(recipeString, prefabName, out RequirementConfig[] requirements))
             {
-                var pieceRequirements = new List<Piece.Requirement>();
-                foreach (var req in requirements)
+                List<Piece.Requirement> pieceRequirements = new List<Piece.Requirement>();
+                foreach (RequirementConfig requirement in requirements)
                 {
-                    var itemPrefab = PrefabManager.Instance.GetPrefab(req.Item);
-                    var itemDrop = itemPrefab != null ? itemPrefab.GetComponent<ItemDrop>() : null;
-                    if (itemDrop != null)
+                    GameObject itemPrefab = PrefabManager.Instance.GetPrefab(requirement.Item);
+                    ItemDrop? itemDrop = itemPrefab ? itemPrefab.GetComponent<ItemDrop>() : null;
+                    if (itemDrop)
                     {
                         pieceRequirements.Add(new Piece.Requirement
                         {
                             m_resItem = itemDrop,
-                            m_amount = req.Amount,
-                            m_amountPerLevel = req.AmountPerLevel,
-                            m_recover = req.Recover
+                            m_amount = requirement.Amount,
+                            m_amountPerLevel = requirement.AmountPerLevel,
+                            m_recover = requirement.Recover
                         });
                     }
                     else
                     {
-                        Plugin.Log.LogError($"[PieceManager] Could not resolve ItemDrop for requirement '{req.Item}' on piece '{prefabName}'.");
+                        Plugin.Log.LogError($"[PieceManager] Could not resolve ItemDrop for requirement '{requirement.Item}' on piece '{prefabName}'.");
                     }
                 }
 
-                if (piece != null)
+                if (piece)
                 {
                     piece.m_resources = pieceRequirements.ToArray();
                 }
             }
 
-            if (piece != null)
+            if (piece)
             {
                 string stationName = CraftingStations.GetInternalName(stationString);
                 if (string.IsNullOrEmpty(stationName) || stationName.Equals("None", StringComparison.OrdinalIgnoreCase))
@@ -620,8 +624,8 @@ namespace PersonalChestHeeler.Pieces
                 }
                 else
                 {
-                    var stationPrefab = PrefabManager.Instance.GetPrefab(stationName);
-                    if (stationPrefab != null)
+                    GameObject stationPrefab = PrefabManager.Instance.GetPrefab(stationName);
+                    if (stationPrefab)
                     {
                         piece.m_craftingStation = stationPrefab.GetComponent<CraftingStation>();
                     }
@@ -633,20 +637,20 @@ namespace PersonalChestHeeler.Pieces
                 }
             }
 
-            var container = customPiece.PiecePrefab.GetComponent<Container>();
-            if (container != null)
+            Container container = customPiece.PiecePrefab.GetComponent<Container>();
+            if (container)
             {
                 container.m_width = width;
                 container.m_height = height;
             }
 
-            var wearNTear = customPiece.PiecePrefab.GetComponent<WearNTear>();
-            if (wearNTear != null)
+            WearNTear wearNTear = customPiece.PiecePrefab.GetComponent<WearNTear>();
+            if (wearNTear)
             {
                 wearNTear.m_health = health;
             }
 
-            if (Player.m_localPlayer != null)
+            if (Player.m_localPlayer)
             {
                 Player.m_localPlayer.UpdateKnownRecipesList();
                 Player.m_localPlayer.UpdateAvailablePiecesList();
@@ -740,7 +744,7 @@ namespace PersonalChestHeeler.Pieces
             if (string.IsNullOrWhiteSpace(itemName)) return false;
             if (itemName.Equals(RecipeConfigDrawer.DefaultPlaceholderPrefab, StringComparison.OrdinalIgnoreCase)) return false;
 
-            var prefab = PrefabManager.Instance != null ? PrefabManager.Instance.GetPrefab(itemName) : null;
+            GameObject prefab = PrefabManager.Instance.GetPrefab(itemName);
             return prefab && prefab.TryGetComponent<ItemDrop>(out _);
         }
 
@@ -754,15 +758,15 @@ namespace PersonalChestHeeler.Pieces
                 return false;
             }
 
-            var parsedItems = RecipeConfigDrawer.Deserialize(recipeString);
+            List<RecipeConfigDrawer.RecipeItemEntry> parsedItems = RecipeConfigDrawer.Deserialize(recipeString);
             if (parsedItems.Count == 0)
             {
                 Plugin.Log.LogError($"[PieceManager] Recipe for piece '{pieceName}' contained no requirement entries.");
                 return false;
             }
 
-            var result = new List<RequirementConfig>();
-            foreach (var item in parsedItems)
+            List<RequirementConfig> result = new List<RequirementConfig>();
+            foreach (RecipeConfigDrawer.RecipeItemEntry item in parsedItems)
             {
                 if (string.IsNullOrWhiteSpace(item.PrefabName))
                 {
@@ -782,7 +786,7 @@ namespace PersonalChestHeeler.Pieces
                     return false;
                 }
 
-                if (PrefabManager.Instance != null && !IsValidItemPrefab(item.PrefabName))
+                if (!IsValidItemPrefab(item.PrefabName))
                 {
                     Plugin.Log.LogError($"[PieceManager] Requirement '{item.PrefabName}' for piece '{pieceName}' does not exist in ObjectDB/PrefabManager.");
                     return false;
@@ -799,7 +803,7 @@ namespace PersonalChestHeeler.Pieces
 
         private static void RotateChildren180(GameObject prefab)
         {
-            var rotation180DegreesY = Quaternion.Euler(0f, 180f, 0f);
+            Quaternion rotation180DegreesY = Quaternion.Euler(0f, 180f, 0f);
             foreach (Transform child in prefab.transform)
             {
                 child.localPosition = rotation180DegreesY * child.localPosition;
@@ -811,17 +815,17 @@ namespace PersonalChestHeeler.Pieces
 
         private static void FixTier6Materials(GameObject prefab)
         {
-            var pieceShader = PrefabManager.Instance.GetPrefab(NativePersonalChestDonor)
+            Shader pieceShader = PrefabManager.Instance.GetPrefab(NativePersonalChestDonor)
                 .GetComponentInChildren<MeshRenderer>().sharedMaterial.shader;
 
-            foreach (var renderer in prefab.GetComponentsInChildren<MeshRenderer>(true))
+            foreach (MeshRenderer renderer in prefab.GetComponentsInChildren<MeshRenderer>(true))
             {
-                var originalMaterial = renderer.sharedMaterial;
-                if (originalMaterial == null) continue;
+                Material originalMaterial = renderer.sharedMaterial;
+                if (!originalMaterial) continue;
 
-                var pieceMaterial = new Material(originalMaterial) { shader = pieceShader };
+                Material pieceMaterial = new Material(originalMaterial) { shader = pieceShader };
 
-                var runeMask = originalMaterial.GetTexture("_EmissiveTex");
+                Texture runeMask = originalMaterial.GetTexture("_EmissiveTex");
                 pieceMaterial.SetTexture("_EmissionMap", runeMask);
                 pieceMaterial.SetTexture("_EmissiveTex", runeMask);
                 pieceMaterial.SetColor("_EmissionColor", originalMaterial.GetColor("_EmissionColor"));
